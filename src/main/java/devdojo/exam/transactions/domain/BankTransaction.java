@@ -1,19 +1,20 @@
 package devdojo.exam.transactions.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.*;
+import lombok.*;
+
+import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Getter
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class BankTransaction {
+
     @JsonProperty("encodedKey")
-    private String id;
+    private String encodedKey;
 
     @JsonProperty("parentAccountKey")
     private String parentAccountKey;
@@ -36,8 +37,7 @@ public class BankTransaction {
 
     private double creditDebitIndicator;
 
-    @JsonProperty("accountBalances.totalBalance")
-    private double runningBalance;
+    private AccountBalances accountBalances;
 
     @JsonProperty("id")
     private String counterPartyAccountNumber;
@@ -45,6 +45,14 @@ public class BankTransaction {
     private String typeGroup;
 
     private double instructedAmount;
+
+    @JsonGetter("runningBalance")
+    public double getRunningBalance() {
+        if (accountBalances != null) {
+            return accountBalances.getRunningBalance();
+        }
+        return 0.0;
+    }
 
     public String getReference() {
         return parentAccountKey;

@@ -24,5 +24,6 @@ public class BankServiceTest {
 
         Assertions.assertFalse(transactions.isEmpty());
         Assertions.assertEquals(14, transactions.size());
+        System.out.println(transactions);
     }
 }

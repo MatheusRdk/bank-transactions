@@ -9,6 +9,9 @@ import devdojo.exam.transactions.requests.BankUserPutRequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class BankUserService {
@@ -19,11 +22,15 @@ public class BankUserService {
                 .orElseThrow(() -> new BadRequestException("User not found."));
     }
 
+    public List<BankUser> listAll(){
+        return bankUserRepository.findAll();
+    }
+
     public BankUser save(final BankUserPostRequestBody bankUserPostRequestBody){
-        final var architect = BankUser.builder()
+        final var bankUser = BankUser.builder()
                 .name(bankUserPostRequestBody.getName())
                 .build();
-        return bankUserRepository.save(architect);
+        return bankUserRepository.save(bankUser);
     }
 
     public void delete(long id){

@@ -2,6 +2,7 @@ server:
   error:
     include-stacktrace: on_param
 
+
 spring:
   application:
     name: bank-transactions
@@ -13,11 +14,10 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
 logging:
   level:
-    org:
-      hibernate:
-        SQL: DEBUG
+      org.springframework.web: trace
 
   info:
     env:
