@@ -1,0 +1,28 @@
+server:
+  error:
+    include-stacktrace: on_param
+
+spring:
+  application:
+    name: bank-transactions
+  datasource:
+    url: jdbc:mysql://localhost:3308/users?createDatabaseIfNotExist=true
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+
+  info:
+    env:
+      enabled: true
+
+info:
+  app: Bank transactions by user
+  github: https://github.com/MatheusRdk/
