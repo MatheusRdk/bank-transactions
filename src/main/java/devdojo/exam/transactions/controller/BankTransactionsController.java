@@ -68,7 +68,7 @@ public class BankTransactionsController {
         return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
 
-    @PostMapping(path = "/random/{id}")
+    @PostMapping(path = "/random/{id}") //Just to put transactions in users.
     public ResponseEntity<Void> saveRandomTransaction(@PathVariable long id) throws IOException {
         BankUser bankUser = bankUserService.findByIdOrThrowBadRequestException(id);
         bankService.randomTransactionToUser(bankUser);
