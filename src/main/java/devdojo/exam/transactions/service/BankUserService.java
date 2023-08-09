@@ -9,13 +9,14 @@ import devdojo.exam.transactions.requests.BankUserPutRequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class BankUserService {
+public class BankUserService{
+
     private final BankUserRepository bankUserRepository;
+
 
     public BankUser findByIdOrThrowBadRequestException(long id){
         return bankUserRepository.findById(id)
@@ -28,7 +29,8 @@ public class BankUserService {
 
     public BankUser save(final BankUserPostRequestBody bankUserPostRequestBody){
         final var bankUser = BankUser.builder()
-                .name(bankUserPostRequestBody.getName())
+                .username(bankUserPostRequestBody.getUsername())
+                .password(bankUserPostRequestBody.getPassword())
                 .build();
         return bankUserRepository.save(bankUser);
     }

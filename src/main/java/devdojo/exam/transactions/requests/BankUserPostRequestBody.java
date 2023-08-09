@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BankUserPostRequestBody{
-    public String name;
+    public String username;
+    public String password;
     }
 

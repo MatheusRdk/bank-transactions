@@ -8,6 +8,6 @@ import lombok.Data;
 public class BankUserPutRequestBody {
     private Long id;
 
-    private String name;
+    private String username;
 }
 
