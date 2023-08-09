@@ -20,6 +20,7 @@ public class BankUser {
     private Long id;
 
     @NotEmpty(message = "Name cannot be empty.")
+    @Column(unique = true)
     private String username;
 
     @ElementCollection

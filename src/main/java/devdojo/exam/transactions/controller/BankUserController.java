@@ -4,6 +4,7 @@ import devdojo.exam.transactions.domain.BankUser;
 import devdojo.exam.transactions.requests.BankUserPostRequestBody;
 import devdojo.exam.transactions.requests.BankUserPutRequestBody;
 import devdojo.exam.transactions.service.BankUserService;
+import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;

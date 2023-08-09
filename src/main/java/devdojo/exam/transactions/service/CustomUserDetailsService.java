@@ -10,6 +10,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
+
+import javax.sql.DataSource;
 
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
@@ -20,6 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public static PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
 
     @Override
     public UserDetails loadUserByUsername(String username){
