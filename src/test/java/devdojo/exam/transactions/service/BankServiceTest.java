@@ -15,12 +15,10 @@ public class BankServiceTest {
     @InjectMocks
     private BankService bankService;
 
-
     @Test
     public void testGetTransactions() throws IOException {
-        String filePath = "resources/transactions.json";
 
-        List<BankTransaction> transactions = bankService.getTransactions(filePath);
+        List<BankTransaction> transactions = BankService.getTransactions();
 
         Assertions.assertFalse(transactions.isEmpty());
         Assertions.assertEquals(14, transactions.size());

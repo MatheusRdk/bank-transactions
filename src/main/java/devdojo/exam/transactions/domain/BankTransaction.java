@@ -76,4 +76,5 @@ public class BankTransaction {
     public double getInstructedAmount(){
         return amount;
     }
+
 }

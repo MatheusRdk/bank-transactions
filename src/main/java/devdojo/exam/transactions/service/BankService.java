@@ -1,13 +1,19 @@
 package devdojo.exam.transactions.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import devdojo.exam.transactions.config.SecurityConfig;
 import devdojo.exam.transactions.domain.BankTransaction;
 import devdojo.exam.transactions.domain.BankUser;
-import devdojo.exam.transactions.repository.BankUserRepository;
-import jakarta.transaction.Transactional;
+import devdojo.exam.transactions.util.StringObjectMap;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -15,17 +21,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class BankService {
 
-    private final BankUserRepository bankUserRepository;
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
-    private String readJson(String filePath) throws IOException {
+    private static final String file = "resources/transactions.json";
+
+    private static String readJson() throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line);
@@ -34,8 +42,8 @@ public class BankService {
         return stringBuilder.toString();
     }
 
-    public List<BankTransaction> getTransactions(String filePath) throws IOException {
-        String jsonContent = readJson(filePath);
+    public static List<BankTransaction> getTransactions() throws IOException {
+        String jsonContent = readJson();
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,29 +55,40 @@ public class BankService {
         );
     }
 
-    @Transactional
-    public void randomTransactionToUser(BankUser user) throws IOException {
-        List<BankTransaction> transactions = getTransactions("resources/transactions.json");
-
-        Random random = new Random();
-        int randomIndex = random.nextInt(transactions.size());
-
-        BankTransaction selectedTransaction = transactions.get(randomIndex);
-
-        List<BankUser> bankUsersList = bankUserRepository.findAll();
-
-        for (BankUser bankUser : bankUsersList) {
-            if (bankUser.getTransactionsEncodedKeys().contains(selectedTransaction.getEncodedKey())) {
-                throw new IllegalStateException("Transaction already associated with the user.");
+    public ResponseEntity<List<Map<String, Object>>> customReponseForAccountId(long accountId) throws IOException {
+        List<BankTransaction> transactions = getTransactions();
+        BankUser bankUser = new BankUser();
+        for (BankUser user : BankUser.getAllUsers()){
+            if (user.getAccountId() == accountId){
+                bankUser = user;
             }
         }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        List<Map<String, Object>> customResponse = new ArrayList<>();
 
-        if (user.getTransactionsEncodedKeys() == null) {
-            user.setTransactionsEncodedKeys(new ArrayList<>());
+        if (!userDetails.getUsername().equals(bankUser.getUsername())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
+        for (BankTransaction transaction : transactions) {
+            if (bankUser.getTransactionsEncodedKeys().contains(transaction.getEncodedKey())) {
+                addExtractedTransactionToCustomResponse(customResponse, transaction);
+            }
+        }
+        return new ResponseEntity<>(customResponse, HttpStatus.OK);
+    }
 
-        user.getTransactionsEncodedKeys().add(selectedTransaction.getEncodedKey());
+    public ResponseEntity<List<Map<String, Object>>> customReponseAll() throws IOException {
+        List<BankTransaction> transactions = getTransactions();
+        List<Map<String, Object>> customResponse = new ArrayList<>();
+        for (BankTransaction transaction : transactions) {
+            addExtractedTransactionToCustomResponse(customResponse, transaction);
+        }
+        return new ResponseEntity<>(customResponse, HttpStatus.OK);
+    }
 
-        bankUserRepository.save(user);
+    public void addExtractedTransactionToCustomResponse(List<Map<String, Object>> customResponse, BankTransaction transaction) {
+        Map<String, Object> customTransaction = StringObjectMap.getStringObjectMap(transaction);
+        customResponse.add(customTransaction);
     }
 }
